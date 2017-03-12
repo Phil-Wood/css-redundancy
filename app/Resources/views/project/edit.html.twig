@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container">
+
+        <div class="row">
+
+            <div class="col-sm-8 col-sm-offset-2">
+
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="page-header">
+                            <h1>{{ project.name }}</h1>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-8 col-md-7 col-lg-6">
+                                
+                                {{ form_start(edit_form) }}
+                                    {{ form_label(edit_form.name) }}
+                                    {{ form_errors(edit_form.name) }}
+                                    <div class="input-group">
+                                        {{ form_widget(edit_form.name) }}
+                                        <span class="input-group-btn">
+                                            <input class="btn btn-primary" type="submit" value="Save" />
+                                        </span>
+                                    </div>
+
+                                {{ form_end(edit_form) }}
+
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="panel-footer clearfix">
+                        <ul class="nav nav-pills">
+                            <li role="presentation"><a href="{{ path('project_index') }}">Back to the list</a></li>
+                            <li class="pull-right">
+                                {{ form_start(delete_form) }}
+                                    <input class="btn btn-danger" type="submit" value="Delete Project">
+                                {{ form_end(delete_form) }}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,30 @@
+
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+
+
+.navbar-brand img {
+	position: relative;
+	top: -13px;
+}
+
+.table > tbody > tr > th, .table > tbody > tr > td {
+    vertical-align: middle;
+}
+
+.form-inline {
+	display: inline-block;
+}
+
+
+
+
+
+
+
+
+
+
+
