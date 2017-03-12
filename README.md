@@ -1,4 +1,6 @@
-dist
+Css Redundacy
 ====
 
-A Symfony project created on February 26, 2017, 8:53 am.
+Create a project, load css file, scrape a site, find css redundancies.
+
+Docs to follow soon.

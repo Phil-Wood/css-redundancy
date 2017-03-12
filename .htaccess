@@ -1,2 +1,4 @@
+Options -MultiViews
 RewriteEngine On
-RewriteRule ^$ /web [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ web/app_dev.php [QSA,L]
