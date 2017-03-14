@@ -3,8 +3,10 @@
 namespace AppBundle\Controller;
 
 use AppBundle\AppBundle;
+use SpiderBundle\SpiderBundle;
 use AppBundle\Entity\Project;
 use AppBundle\Entity\Selector;
+use AppBundle\Entity\Html;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -69,6 +71,10 @@ class ProjectController extends Controller
                 new File($this->getParameter('css_directory').'/'.$project->getId().'/'.$project->getCssFile())
             );
         }
+
+        $html = new Html();
+
+        $urlForm = $this->createForm('AppBundle\Form\HtmlType', $html);
         
         $cssForm = $this->createForm('AppBundle\Form\CssFileType', $project);
         $cssForm->handleRequest($request);
@@ -109,6 +115,7 @@ class ProjectController extends Controller
 
         return $this->render('project/show.html.twig', array(
             'project' => $project,
+            'url_form' => $urlForm->createView(),
             'css_form' => $cssForm->createView(),
             'delete_form' => $deleteForm->createView(),
             'cssFileShort' => $cssFileShort,
@@ -127,8 +134,11 @@ class ProjectController extends Controller
         $editForm = $this->createForm('AppBundle\Form\ProjectType', $project);
         $editForm->handleRequest($request);
 
-        if ($editForm->isSubmitted() && $editForm->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+        if ($editForm->isSubmitted()) {
+            
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($project);
+            $em->flush($project);
 
             return $this->redirectToRoute('project_index');
         }
@@ -188,15 +198,15 @@ class ProjectController extends Controller
     }
 
     /**
-     * Crunches the uploaded css file.
+     * Splitss the uploaded css file into selectors.
      *
-     * @Route("/{id}/crunch_css", name="crunch_css")
+     * @Route("/{id}/split_css", name="split_css")
      * @Method("GET")
      */
-    public function crunchCssAction(Project $project)
+    public function splitCssAction(Project $project)
     {
         $AppBundle = new AppBundle();
-        $selectorArray = $AppBundle->crunchCss($this->getParameter('css_directory').'/'.$project->getId().'/'.$project->getCssFile());
+        $selectorArray = $AppBundle->splitCss($this->getParameter('css_directory').'/'.$project->getId().'/'.$project->getCssFile());
 
         $project->setSelectors(count($selectorArray));
         $em = $this->getDoctrine()->getManager();
@@ -212,6 +222,67 @@ class ProjectController extends Controller
         $em->flush($project);
 
         return $this->redirectToRoute('project_show', array('id' => $project->getId()));
+    }
+
+    /**
+     * Use submitted url to perform a site wide scrape.
+     *
+     * @Route("/{id}/scrape_site", name="scrape_site")
+     * @Method({"GET", "POST"})
+     */
+    public function scrapeSiteAction(Request $request, Project $project)
+    {
+        $html = new Html();
+        $urlForm = $this->createForm('AppBundle\Form\HtmlType', $html);
+        $urlForm->handleRequest($request);
+
+        if ($urlForm->isSubmitted()) {
+
+            $em = $this->getDoctrine()->getManager();
+
+            $projectData = array(
+                'projectId'     => $project->getId(),
+                'em'            => $em,
+                'htmlFilePath'  => $this->getParameter('html_directory').'/'.$project->getId().'/'
+                );
+        
+            $SpiderBundle = new SpiderBundle();
+            $spiderData = $SpiderBundle->crawl($html->getUrl(), $maxDepth = 10, $projectData);
+
+            $count = 0;
+            foreach ($spiderData->links() as $link) {
+                if ($link['visited']) {
+                   $count++;
+                }
+            }
+
+            $project->setPages($count);
+            $em->persist($project);
+            $em->flush($project);
+
+            return $this->redirectToRoute('project_show', array('id' => $project->getId()));
+        }
+    }
+
+
+    /**
+     * Find Redundancies.
+     *
+     * @Route("/{id}/find_redundancies", name="find_redundancies")
+     * @Method("GET")
+     */
+    public function findRedundancies(Project $project){
+
+        $em = $this->getDoctrine()->getManager();
+        $selectorArray = $em->getRepository('AppBundle:Selector')
+        ->findByProjectId($project->getId());
+
+        //$path = $this->getParameter('html_directory').'/index.html';
+        $path = "http://phillipwood.me";
+
+        $AppBundle = new AppBundle();
+        $AppBundle->runTheNumbers($selectorArray, $path);
+        
     }
 
     /**

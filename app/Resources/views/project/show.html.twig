@@ -5,14 +5,21 @@
 
         <div class="row">
 
-            <div class="col-sm-8 col-sm-offset-2">
+            <div class="col-sm-12 col-sm-offset-0 col-md-8 col-md-offset-2 col-lg-8 col-lg-offset-2">
 
                 <div class="panel panel-default">
                     <div class="panel-body">
-
-                        <div class="page-header">
-                            <h1>{{ project.name }}</h1>
+                        <div class="row">
+                            <div class="col-sm-8">
+                                <div class="page-header">
+                                    <h1>{{ project.name }}</h1>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <span class="big-percentage">0%</span>
+                            </div>
                         </div>
+                    
                         <table class="table">
                             <caption>Project Data</caption>
                             <tbody>
@@ -43,11 +50,11 @@
                                     </td>
                                     <td>
                                         {% if cssFileShort is not null and cssFileShort is not empty %}
-                                            <a href="/{{ project.id }}/crunch_css" class="btn btn-sm btn-primary 
+                                            <a href="/{{ project.id }}/split_css" class="btn btn-sm btn-primary 
                                             {% if project.selectors != (0) %}
                                                 disabled
                                             {% endif %}
-                                                ">Crunch</a>
+                                                ">Split</a>
                                             <a href="/{{ project.id }}/delete_css" class="btn btn-sm btn-danger">Delete</a>
                                         {% endif %}
                                     </td>
@@ -56,33 +63,46 @@
                         </table>
 
                         <hr>
-
-                        <ul>
-                            <li>Input a Url</li>
-                            <li>Add a html file, tick box for "Perform a site wide scrape"</li>
-                            <li>Run the redundancy checker</li>
-                        </ul>
-
-                        <hr>
-
-                        {{ form_start(css_form) }}
-                            {{ form_row(css_form.cssfile) }}
-                            <input class="btn btn-primary" type="submit" value="Upload CSS File">
-                        {{ form_end(css_form) }}
-
-                        <hr>
-
                         <div class="row">
                             <div class="col-lg-6">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
 
-                                <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Url">
-                                    <span class="input-group-btn">
-                                        <button class="btn btn-default" type="button">Go!</button>
-                                    </span>
+                                        {{ form_start(css_form) }}
+                                            {{ form_row(css_form.cssfile) }}
+                                            <input class="btn btn-primary" type="submit" 
+                                            {% if cssFileShort is not null and cssFileShort is not empty %}
+                                               disabled  
+                                            {% endif %}   
+                                            value="Upload CSS File">
+                                        {{ form_end(css_form) }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">        
+                                <div class="panel panel-default">
+                                    <div class="panel-body">    
+
+                                        {{ form_start(url_form, {'action': path('scrape_site', {'id': project.id})}) }}
+                                            {{ form_label(url_form.url) }}
+                                            {{ form_errors(url_form.url) }}
+                                            <div class="input-group">
+                                                {{ form_widget(url_form.url, { 'attr': {'placeholder': 'http://'} }) }}
+                                                <span class="input-group-btn">
+                                                    <input class="btn btn-primary" type="submit" value="Scrape!" />
+                                                </span>
+                                            </div>
+                                            <p class="help-block">Example : http://wooples.com</p>
+                                        {{ form_end(url_form) }}  
+
+                                    </div>
                                 </div>
                             </div>
                         </div>
+
+                        <hr>
+
+                        <a class="btn btn-block btn-lg btn-primary disabled" href="/{{ project.id }}/find_redundancies">CRUNCH IT!</a>
 
                         
                     </div>

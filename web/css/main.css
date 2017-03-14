@@ -4,10 +4,25 @@
    Author's custom styles
    ========================================================================== */
 
-
+body {
+	background: url('../img/shattered-island.gif');
+}
+a.navbar-brand {
+	height: 150px;
+	padding-left: 0;
+}
+@media (min-width: 992px){
+	a.navbar-brand {
+		height: 50px;
+	}
+	a.navbar-brand img {
+		position: relative;
+		top: 30px;
+	}
+}
 .navbar-brand img {
-	position: relative;
-	top: -13px;
+	height: 120px;
+	width: 120px;
 }
 
 .table > tbody > tr > th, .table > tbody > tr > td {
@@ -16,6 +31,11 @@
 
 .form-inline {
 	display: inline-block;
+}
+
+.big-percentage {
+	font-size: 110px;
+	font-weight: 700;
 }
 
 

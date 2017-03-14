@@ -8,6 +8,7 @@ imports:
 parameters:
     locale: en
     css_directory: '%kernel.root_dir%/../web/uploads/cssfiles'
+    html_directory: '%kernel.root_dir%/../web/uploads/htmlfiles'
 
 framework:
     #esi:             ~
